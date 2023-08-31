@@ -1,46 +1,67 @@
-import { SyntheticEvent } from "react";
-import { useRef } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { FormEvent, useState } from "react";
+import { Box, Button, Container, FormLabel, TextField } from "@mui/material";
+
+import SubmitButton from "@/components/submit-button";
+import ErrorMessage from "@/components/error-message";
+import Title from "@/components/title";
 
 export default function SignupPage() {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const onHandleSubmit = (event: SyntheticEvent) => {
+  const onHandleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const name = nameRef.current?.value;
-    const email = emailRef.current?.value;
-    const password = passwordRef.current?.value;
-    const data = { name, email, password };
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData);
 
+    setLoading(true);
     fetch('/api/auth/signup', {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
         'Content-Type': 'application/json'
       }
-    });
+    }).then(res => res.json())
+      .then((res: any) => {
+        console.log(res.error);
+        
+        if (res.error) {
+          setErrorMessage(res.error);
+        } else {
+          router.push('/auth/signin');
+        }
+      })
+      .catch(e => setErrorMessage(e.message))
+      .finally(() => setLoading(false));
   };
 
   return (
-    <div>
-      <h1>Quero me cadastrar</h1>
-      <form onSubmit={onHandleSubmit}>
-        <div>
-          <label>Nome</label>
-          <input name="name" ref={nameRef} />
-        </div>
-        <div>
-          <label>E-mail</label>
-          <input name="email" type="email" ref={emailRef} />
-        </div>
-        <div>
-          <label>Senha</label>
-          <input name="password" type="password" ref={passwordRef} />
-        </div>
-        <button type="submit">Criar meu usuário</button>
-      </form>
-    </div>
+    <Container sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Head>
+        <title>Tá investido - Cadastrar</title>
+      </Head>
+
+      <Title>Quero me cadastrar</Title>
+
+      <Box component="form" onSubmit={onHandleSubmit} sx={{ display: 'flex', flexDirection: 'column' }}>
+        <FormLabel>Nome</FormLabel>
+        <TextField name="name" required />
+      
+        <FormLabel>E-mail</FormLabel>
+        <TextField name="email" type="email" required />
+      
+        <FormLabel>Senha</FormLabel>
+        <TextField name="password" type="password" required />
+      
+        <SubmitButton loading={loading}>Cadastrar</SubmitButton>
+      </Box>
+
+      <ErrorMessage>{errorMessage}</ErrorMessage>
+      <Button onClick={() => router.push('/auth/signin')} sx={{ mt: 2 }}>Já tenho conta</Button>
+    </Container>
   );
 }
