@@ -1,11 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import { encryptPassword } from '@/middlewares/password';
+import { executeOperations } from '@/middlewares/db';
 import UnprocessableEntity from '@/lib/errors/unprocessable-entity';
-import { executeDatabaseOperations } from '@/middlewares/db';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  executeDatabaseOperations(res, async (prisma: PrismaClient) => {
+  executeOperations(res, async (prisma: PrismaClient) => {
     const { name, email, password } = req.body;
 
     if (!name || name.length < 7) {
@@ -28,8 +28,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const passwordHash = encryptPassword(password);
-    await prisma.user.create({
+    user = await prisma.user.create({
       data: { name, email, password: passwordHash }
+    });
+
+    const wallet = await prisma.wallet.create({
+      data: { name: 'Carteira', userId: user.id }
+    });
+
+    await prisma.user.update({
+      data: { currentWalletId: wallet.id },
+      where: { id: user.id }
     });
 
     res.status(201).json({ message: 'success' });

@@ -11,8 +11,17 @@ datasource db {
 }
 
 model User {
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  name            String
+  password        String
+  currentWalletId Int      @default(0)
+  wallets         Wallet[]
+}
+
+model Wallet {
   id       Int      @id @default(autoincrement())
-  email    String   @unique
   name     String
-  password String
+  userId   Int
+  User     User?    @relation(fields: [userId], references: [id])
 }
