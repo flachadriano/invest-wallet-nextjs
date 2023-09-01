@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:run": "prisma migrate dev --name init --schema ./src/prisma/schema.prisma"
+    "db:run": "prisma migrate dev --name change --schema ./src/prisma/schema.prisma"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
