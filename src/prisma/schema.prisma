@@ -17,11 +17,21 @@ model User {
   password        String
   currentWalletId Int      @default(0)
   wallets         Wallet[]
+  brokers         Broker[]
 }
 
 model Wallet {
   id       Int      @id @default(autoincrement())
   name     String
+  userId   Int
+  User     User?    @relation(fields: [userId], references: [id])
+}
+
+model Broker {
+  id       Int      @id @default(autoincrement())
+  name     String
+  acronym  String
+  cnpj     String
   userId   Int
   User     User?    @relation(fields: [userId], references: [id])
 }
