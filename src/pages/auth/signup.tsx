@@ -1,11 +1,11 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
-import { FormEvent, useState } from "react";
-import { Box, Button, Container, FormLabel, TextField } from "@mui/material";
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { FormEvent, useState } from 'react';
+import { Box, Button, Container, FormLabel, TextField } from '@mui/material';
 
-import SubmitButton from "@/components/submit-button";
-import ErrorMessage from "@/components/error-message";
-import Title from "@/components/title";
+import SubmitButton from '@/components/submit-button';
+import ErrorMessage from '@/components/error-message';
+import Title from '@/components/title';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -27,8 +27,6 @@ export default function SignupPage() {
       }
     }).then(res => res.json())
       .then((res: any) => {
-        console.log(res.error);
-        
         if (res.error) {
           setErrorMessage(res.error);
         } else {

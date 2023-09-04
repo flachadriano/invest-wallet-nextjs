@@ -1,11 +1,26 @@
-import NextAuth from 'next-auth';
+import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { executeQueries } from '@/middlewares/db';
 import { isValidPassword } from '@/middlewares/password';
 
-export default NextAuth({
+export const authOptions: NextAuthOptions = {
+  secret: process.env.AUTH_SECRET,
   session: {
     strategy: 'jwt'
+  },
+  callbacks: {
+    jwt({ user, token }) {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (session?.user) {
+        session.user.id = token.uid;
+      }
+      return session;
+    },
   },
   providers: [
     CredentialsProvider({
@@ -27,4 +42,6 @@ export default NextAuth({
       },
     })
   ]
-});
+};
+
+export default NextAuth(authOptions);

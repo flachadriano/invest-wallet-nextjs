@@ -1,4 +1,6 @@
+import Title from '@/components/title';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -7,7 +9,9 @@ export default function Home() {
         <title>Tá investido</title>
       </Head>
       <div>
-        <h1>Tá investido</h1>
+        <Link href="/brokers">
+          <Title>Corretoras</Title>
+        </Link>
       </div>
     </>
   );
